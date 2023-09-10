@@ -35,8 +35,8 @@ religiousness, and children. Personally I approached this assignment with a
 bias towards men have more extramartial affairs than women.
 
 ## Sources
- [All data sources](https://vincentarelbundock.github.io/Rdatasets/articles/data.html)
- [Data Source Description](https://vincentarelbundock.github.io/Rdatasets/doc/AER/Affairs.html)
+ [Click here to view all data  sources](https://vincentarelbundock.github.io/Rdatasets/articles/data.html) ||
+ [Click here to view Data Source Description](https://vincentarelbundock.github.io/Rdatasets/doc/AER/Affairs.html)
  
 ## Data Gathering, Collation and Simple Bar Chart
 In the code chunk below I am gathering the data from a remote data source (line 45)
