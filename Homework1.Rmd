@@ -1,0 +1,79 @@
+---
+title: "Homework1"
+author: "Dave Greer"
+date: "2023-09-09"
+output: html_document
+---
+
+``````{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+##install.packages("utf8")
+##install.packages("ggstatsplot")
+
+library(here)
+library(readr)
+library(ggstatsplot)
+library(purrr)
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+library(qqplotr)
+library(jtools) 
+library(DT)
+options(scipen=999)
+
+```
+
+## Introduction
+
+For this assignment I decided to learn something about extramarial affairs. I 
+wanted to know which gender was more likely to have an extramatrial affair.
+I found a data set called "Fair's Extramarital Affairs Data".  This data was 
+collected in 1969 and contains 601 observations of 9 variables about how many
+extramartial affairs people had over a 12 month period. 
+The variables in the dataset include age, gender, education, occupation, 
+religiousness, and children. Personally I approached this assignment with a 
+bias towards men have more extramartial affairs than women.
+
+## Sources
+ [All data sources](https://vincentarelbundock.github.io/Rdatasets/articles/data.html)
+ [Data Source Description](https://vincentarelbundock.github.io/Rdatasets/doc/AER/Affairs.html)
+ 
+## Data Gathering, Collation and Simple Bar Chart
+In the code chunk below I am gathering the data from a remote data source (line 45)
+In lines 48 through 57 I am giving the columns in dataframe meaningful titles.
+I am converting the Number of Years column to Number of Months because its easier to work with integers. On line 63 I am removing the observation that did not contain at least 1 affair.
+The data is displayed in tabular format on line 65 and a simple bar chart is created on lines 67 and 68.
+
+
+```{r}
+
+dat <- read_csv('https://raw.githubusercontent.com/greerda/Data607/main/Affairs.csv')
+
+df_affairs <- dat|> select(`Number of Affairs` = affairs,
+                            Age = age,
+                            Gender =gender,
+                           `Months Married`= yearsmarried,
+                           `Has Children` = children,
+                           `Religiosity Level (1-5)`= religiousness,
+                            `Highest Grade Level Achieved` =education,
+                           `Level of Satisfaction with Marriage (1-5)`= rating)
+
+df_affairs$`Months Married`<- round(df_affairs$`Months Married`*12,0)
+
+df_affairs<-df_affairs|>filter(`Number of Affairs`>0)
+
+datatable(df_affairs)
+
+ggplot(df_affairs, aes(x=Gender, y=`Number of Affairs`, fill=Gender) )+
+          geom_bar(stat = "identity" )+theme_minimal()+ggtitle("Number of Extra Martial Affairs by Gender") 
+
+
+                      
+```
+
+## Conclusion and Recommendations 
+After performing this basic analysis I was surprised that my personal biases
+were overturned. I initially thought that men would have a exponentially greater
+number of extramartial affairs.  Based on this information I recommend that
+men should buy their wives flowers periodically when they go to Costco.
+
