@@ -1,0 +1,39 @@
+---
+title: "SQLAndR"
+author: "Dave Greer"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+#install.packages("RODBC")
+```
+```{r}
+library(RODBC)
+library(DT)
+```
+```{r}
+db_conn <-odbcConnect("LocalDSN", rows_at_time =1)
+if(db_conn == -1){
+  quit("no", 1)
+}
+print(db_conn)
+```
+```{r}
+
+sql <-"SET NOCOUNT ON; Select * from SQLAndRView;"
+
+df_tstsql <- sqlQuery(db_conn, sql)
+odbcClose(db_conn)
+
+```
+```{r}
+
+datatable(df_tstsql)
+
+```
+
+
