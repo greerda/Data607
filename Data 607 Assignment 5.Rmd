@@ -1,0 +1,101 @@
+---
+title: "Data 607 Assignment 5"
+author: "Dave Greer"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+always_allow_html: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#install.packages("RODBC")
+library(RODBC)
+library(DT)
+library(ggstatsplot)
+library(tidyverse)
+```
+## Introduction
+For this assignment I decided to build a normalized database to contain all the values. I performed a basic comparison between two airlines, AM West and Alaska.  The data was derived from the assignment pdf.
+
+```{r }
+db_conn <-odbcConnect("Assignment5", rows_at_time =1)
+if(db_conn == -1){
+  quit("no", 1)
+}
+print(db_conn)
+```
+## Here I create the connection between my database and my R markdown sheet.
+
+```{r  echo=FALSE}
+sql <-"SET NOCOUNT ON; Select * from AirlineFlights;"
+df_tstsql <- sqlQuery(db_conn, sql)
+odbcClose(db_conn)
+```
+Rather than create a query to pull the data from the individual tables I
+wrote a database view and queried the view. In this case the view is named 
+AirlineFlights.
+
+```{r}
+datatable(df_tstsql)
+```
+I selected the fields required for analysis and I built an plot show the on-time disparity 
+between AM West and Alaska.
+```{r}
+select(df_tstsql,Status,NumberOfMinutes,AirlineName)
+dfOntime<-filter(df_tstsql,Status=="ontime")
+ggplot(dfOntime, aes(x=CityName, y=NumberOfMinutes/1000))+
+  geom_point(aes(color=AirlineName))
+
+```
+##Summary of Alaska On-time Minutes to Selected Cities 
+```{r}
+dfOntimeAlaska<-filter(df_tstsql,Status=="ontime" & AirlineName== "Alaska" )
+
+dfNumberOfOntimeAlaskaMinutes<-select(dfOntimeAlaska,NumberOfMinutes)
+
+summary(dfNumberOfOntimeAlaskaMinutes)
+```
+##Summary of AM West On-time Minutes to Selected Cities 
+```{r}
+dfOntimeAmWest<-filter(df_tstsql,Status=="ontime" & AirlineName== "AM West" )
+dfNumberOfOntimeAMWestMinutes<-select(dfOntimeAmWest,NumberOfMinutes)
+summary(dfNumberOfOntimeAMWestMinutes)
+```
+##Below is the plot showing the delay disparity between AM West and Alaska Airlines
+```{r}
+select(df_tstsql,Status,NumberOfMinutes,AirlineName)
+dfDelayed<-filter(df_tstsql,Status=="delayed")
+ggplot(dfDelayed, aes(x=CityName, y=NumberOfMinutes/100))+geom_point(aes(color=AirlineName))
+
+```
+##Summary of Alaska Delayed Minutes to Selected Cities 
+```{r}
+dfDelayedAlaska<-filter(df_tstsql,Status=="delayed" & AirlineName== "Alaska" )
+dfNumberOfdfDelayedAlaskaMinutes<-select(dfDelayedAlaska,NumberOfMinutes)
+summary(dfNumberOfdfDelayedAlaskaMinutes)
+```
+##Summary of AM West Delayed Minutes to Selected Cities 
+```{r}
+dfDelayedAmWest<-filter(df_tstsql,Status=="delayed" & AirlineName== "AM West" )
+dfNumberOfdfDelayedAmWestMinutes<-select(dfDelayedAmWest,NumberOfMinutes)
+summary(dfNumberOfdfDelayedAmWestMinutes)
+```
+##Analysis
+
+##Arrivals
+Based on the summary and the chart, the mean and max of on time arrival
+is greater with AM West. This is especially true with regards to Phoenix.
+Phoenix appears to be an outlier. Otherwise, the median arrivals is slightly 
+greater with Alaska.  
+
+##Delays
+Based on the summary and the chart, the mean and max of on time delays
+is greater with AM West, again this is especially true with regards to Phoenix.
+Phoenix appears to be an outlier. But in the case of delays Alaska's median
+is lower than AM West.
+
+
+
+

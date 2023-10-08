@@ -1,0 +1,105 @@
+USE [Assignment5]
+GO
+
+/****** Object:  Table [dbo].[Airline]    Script Date: 10/8/2023 18:42:31 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Airline](
+	[PK_ID] [int] IDENTITY(1,1) NOT NULL,
+	[AirlineName] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_Airline] PRIMARY KEY CLUSTERED 
+(
+	[PK_ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+USE [Assignment5]
+GO
+
+/****** Object:  Table [dbo].[City]    Script Date: 10/8/2023 18:42:57 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[City](
+	[PK_ID] [int] IDENTITY(1,1) NOT NULL,
+	[CityName] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_City] PRIMARY KEY CLUSTERED 
+(
+	[PK_ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+USE [Assignment5]
+GO
+
+/****** Object:  Table [dbo].[Status]    Script Date: 10/8/2023 18:43:14 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Status](
+	[PK_ID] [int] IDENTITY(1,1) NOT NULL,
+	[StatusName] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_Status] PRIMARY KEY CLUSTERED 
+(
+	[PK_ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+USE [Assignment5]
+GO
+
+/****** Object:  Table [dbo].[FlightDelays]    Script Date: 10/8/2023 18:43:31 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[FlightDelays](
+	[PK_ID] [int] IDENTITY(1,1) NOT NULL,
+	[NumberOfMinutes] [int] NOT NULL,
+	[FK_Airline] [int] NULL,
+	[FK_City] [int] NULL,
+	[FK_Status] [int] NULL,
+ CONSTRAINT [PK_NumberOfFlights] PRIMARY KEY CLUSTERED 
+(
+	[PK_ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[FlightDelays]  WITH CHECK ADD  CONSTRAINT [FK_NumberOfFlights_Airline] FOREIGN KEY([FK_Airline])
+REFERENCES [dbo].[Airline] ([PK_ID])
+GO
+
+ALTER TABLE [dbo].[FlightDelays] CHECK CONSTRAINT [FK_NumberOfFlights_Airline]
+GO
+
+ALTER TABLE [dbo].[FlightDelays]  WITH CHECK ADD  CONSTRAINT [FK_NumberOfFlights_City] FOREIGN KEY([FK_City])
+REFERENCES [dbo].[City] ([PK_ID])
+GO
+
+ALTER TABLE [dbo].[FlightDelays] CHECK CONSTRAINT [FK_NumberOfFlights_City]
+GO
+
+ALTER TABLE [dbo].[FlightDelays]  WITH CHECK ADD  CONSTRAINT [FK_NumberOfFlights_Status] FOREIGN KEY([FK_Status])
+REFERENCES [dbo].[Status] ([PK_ID])
+GO
+
+ALTER TABLE [dbo].[FlightDelays] CHECK CONSTRAINT [FK_NumberOfFlights_Status]
+GO
+
