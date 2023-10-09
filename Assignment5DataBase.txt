@@ -103,3 +103,23 @@ GO
 ALTER TABLE [dbo].[FlightDelays] CHECK CONSTRAINT [FK_NumberOfFlights_Status]
 GO
 
+USE [Assignment5]
+GO
+
+/****** Object:  View [dbo].[AirlineFlights]    Script Date: 10/8/2023 23:32:30 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE VIEW [dbo].[AirlineFlights]
+AS
+SELECT   dbo.FlightDelays.NumberOfMinutes, dbo.Status.StatusName AS Status, dbo.Status.PK_ID AS Status_ID, dbo.Airline.AirlineName, dbo.Airline.PK_ID AS Airline_ID, dbo.City.CityName, 
+                         dbo.City.PK_ID
+FROM         dbo.FlightDelays INNER JOIN
+                         dbo.Airline ON dbo.FlightDelays.FK_Airline = dbo.Airline.PK_ID INNER JOIN
+                         dbo.City ON dbo.FlightDelays.FK_City = dbo.City.PK_ID INNER JOIN
+                         dbo.Status ON dbo.FlightDelays.FK_Status = dbo.Status.PK_ID
+GO
+
