@@ -1,0 +1,87 @@
+---
+title: "project2b"
+author: "Shaya Engelman and David Greer"
+date: "2023-10-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(RCurl)
+library(tidyverse)
+```
+
+
+This dataset was provided to me by David Greer and we worked together on this project. The data is a collection of terror attacks from 1970-2021 around the world broken down by attack method. For this project I wanted to summarise the terror attacks specifically in the Middle East and see the relative amounts between Middle Eastern countries.
+
+First, I printed the head and plotted the global breakdown of different attack methods just to illustrate the contents of the dataframe.
+```{r}
+terror <- read.csv("https://raw.githubusercontent.com/Shayaeng/Data607/main/Project2/terrorist-attacks-by-method.csv")
+
+head(terror)
+
+method_columns <- colnames(terror)[grep("^Terrorist.attacks.", colnames(terror))]
+cleaned_columns <- sub("^Terrorist.attacks.", "", method_columns)
+colnames(terror)[grep("^Terrorist.attacks.", colnames(terror))] <- cleaned_columns
+countries <- unique(terror$Entity)
+
+terror_long <- pivot_longer(terror, cols = (all_of(cleaned_columns)), names_to = "method", values_to = "count")
+
+ggplot(terror_long, aes(x = method, y = count, fill = method)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Count of Terrorist Attacks by Method",
+       x = "Attack Method",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  scale_y_continuous(labels = scales::comma_format(scale = 1e-3))
+
+```
+
+According to the CIA, the countries in the following vector are in the Middle East. This can be found here https://www.cia.gov/the-world-factbook/middle-east/. I will create a subset dataframe containing the countries in the Middle East. After that I summarized the data by total amount of attacks over all years and plotted it.
+
+```{r}
+middleEast <- c('Armenia','Azerbaijan','Bahrain','Gaza Strip','Georgia','Iran','Iraq','Israel','Jordan','Kuwait','Lebanon','Oman','Qatar','Saudi Arabia','Syria','Turkey','United Arab Emirates','West Bank','Yemen')
+
+MEterror <- terror %>% filter(Entity %in% middleEast)
+
+summary_data <- MEterror %>%
+  group_by(Entity) %>%
+  summarize(across(all_of(cleaned_columns), ~ sum(., na.rm = TRUE)))
+  
+
+summary_data_long <- summary_data %>%
+  pivot_longer(cols = -Entity, names_to = "Attack_Method", values_to = "Total_Attacks")
+
+ggplot(summary_data_long, aes(x = Entity, y = Total_Attacks, fill = Attack_Method)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Total Attacks per Country by Attack Method",
+       x = "Country",
+       y = "Total Attacks",
+       fill = "Attack Method") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+The above plot doesn't factor in the size of the country. To do that I added the 2023 population total and replotted the above as a ratio. Th population data was taken from here: https://www.census.gov/data-tools/demo/idb/
+
+```{r}
+me_population <- c(2.99, 10.6, 1.55, 2.1, 4.93, 87.59, 41.27, 9.26, 11.09, 3.1, 5.33, 3.83, 2.53, 35.94, 22.93, 83.59, 9.97, 3.18, 31.57)
+
+population_df <- data.frame(middleEast, me_population)
+
+summary_data <- summary_data %>%
+  mutate(Total_Attacks = rowSums(select(., 2:10)))
+
+summary_data <- left_join(summary_data, population_df, by = c("Entity" = "middleEast"))
+
+summary_data$Attack_Ratio <- summary_data$Total_Attacks / summary_data$me_population
+
+ggplot(summary_data, aes(x = Entity, y = Attack_Ratio)) +
+  geom_bar(stat = "identity", position = "stack", fill = "blue") +
+  labs(title = "Total Attacks per Country by Attack Method (Ratio over Population)",
+       x = "Country",
+       y = "Attack Ratio") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+In the above plot we can see the unfortunate ratios of terror attacks per country in the Middle East.

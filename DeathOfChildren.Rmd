@@ -1,0 +1,48 @@
+---
+title: "Deaths in Children Under 5"
+author: "Dave Greer"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(tidy.opts = list(width.cutoff = 60), tidy = TRUE)
+library(formatR)
+library(ggstatsplot)
+library(purrr)
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+library(qqplotr)
+library(jtools) 
+```
+
+# Deaths of Children Under 5 Year of Age
+
+
+There are many causes of death for children under the age of 5 across the world. The data source was the Our World in Data and specifically, which was a worldwide longitudinal study of childhood deaths. The study began in 1990 and ended in 2020. The study included all the countries and United Nations recognized regions.
+
+The study included 26 causes of death ranging from tuberculosis to drowning and malaria to lower respiratory infections. We decided to limit our discussion to deaths by nutritional deficiencies. The data was grouped by UN regions.
+
+The chart below clearly displays that the overall trend has been a steep drop in deaths worldwide.
+The steepest drops occurring in the African Region and South-East Asia Region.
+In the South-East Asia saw a drop from 256,295 deaths in 1990 to 13,082 in 2019.
+This constitutes a 95% drop in deaths caused by poor nutrition.
+In the African Region there was drop from 170,136 deaths in 1990 to 63,483 in 2019, which is a 62.7 drop%
+drop in childhood deaths because of nutritional deficiencies.
+
+```{r }
+options(scipen=10)
+df_deathOfChildren<-read.csv('https://shorturl.at/pyFTV')
+df_deathOfChildrenasTibble<-
+x<- select(df_deathOfChildren,1,3,6)
+y<-x|>filter(grepl("WHO", Entity))
+NutritionalDeficiencies<- tibble::rowid_to_column(y, "ID")
+NutritionalDeficiencies<-NutritionalDeficiencies|>rename(Deaths=`Deaths...Nutritional.deficiencies...Sex..Both...Age..Under.5..Number.` )
+NutritionalDeficiencies<-NutritionalDeficiencies|>rename(`WHO Region`=Entity)
+ggplot(NutritionalDeficiencies,aes(x=Year,y=Deaths, color=`WHO Region`))+ geom_path()+labs(y="Number of Deaths" ,x="Year")
+
+
+```

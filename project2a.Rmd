@@ -1,0 +1,51 @@
+---
+title: "project2a"
+author: "Shaya Engelman and David Greer"
+date: "2023-10-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(RCurl)
+```
+
+For this analysis, I chose a dataset posted by Marley Myrianthopoulos in the Slack channel. It is a breakdown of home runs hit by position and team in MLB's AL East division over the last five full seasons (2020 had a shortened season due to the pandemic). The question I want answered is if the HRs by the Catcher position have decreased over time. As a casual baseball fan, my feeling has been over the last few years teams have prioritized the defense at the catching position more than the offense and I would expect to see a decrease over time at catcher.
+
+```{r}
+homers <- read.csv("https://raw.githubusercontent.com/Shayaeng/Data607/main/Project2/baseball_hr.csv")
+```
+ 
+ First I will filter out the other positions and lengthen the table to have the year as a value.
+```{r}
+homers_long <- homers %>%
+  gather(key = "Year", value = "Total_HRs", starts_with("X")) %>%
+  mutate(Year = as.numeric(str_extract(Year, "\\d+"))) %>%
+  filter(!is.na(Total_HRs) & Position == "C")
+```
+
+Now I will plot the data to see if there was a trend over the last few years.
+
+```{r}
+ggplot(homers_long, aes(x = factor(Year), y = Total_HRs)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Total Home Runs Across All Teams and Years",
+       x = "Year",
+       y = "Total Home Runs") +
+  theme_minimal()
+
+ggplot(homers_long, aes(x = factor(Year), y = Total_HRs, fill = Team)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Catcher Home Runs Across AL East Teams",
+       x = "Year",
+       y = "Total Home Runs") +
+  theme_minimal()
+```
+
+The first plot does seem to show an overall downward trend (albeit over a very small sample size) starting in 2019. However, by recreating the plot with a team by team breakdown there seems to have been one specific team in both 2019 and 2021 with oversize production from their catchers, NYY and TBR. A quick Google search will turn up that they were both voted as All Stars in those specific season and thus cannot be indicative of league-wide trends.
+
+In conclusion, I would say my hypothesis was wrong and there does not seem to be a trend of lower catcher totals. However, this is not a very large sample size and there is evidence for the theory so it is not enough data to draw conclusions. 
