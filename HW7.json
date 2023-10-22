@@ -1,0 +1,71 @@
+[
+    {
+        "title": "Design Patterns",
+        "Author": [
+            {
+                "Author": "Freeman",
+                "Attributes": [
+                    {
+                        "Clarity": "Yes",
+                        "Brevity": "Yes"
+                    }
+                ]
+            },
+            {
+                "Author": "Friedman",
+                "Attributes": [
+                    {
+                        "Clarity": "Yes",
+                        "Brevity": "Yes"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title": "C++ Primer",
+        "Author": [
+            {
+                "Author": "Lippman",
+                "Attributes": [
+                    {
+                        "Clarity": "No",
+                        "Brevity": "No"
+                    }
+                ]
+            },
+            {
+                "Author": "Lajoe",
+                "Attributes": [
+                    {
+                        "Clarity": "No",
+                        "Brevity": "No"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title": "JQuery",
+        "Author": [
+            {
+                "Author": "York",
+                "Attributes": [
+                    {
+                        "Clarity": "No",
+                        "Brevity": "Yes"
+                    }
+                ]
+            },
+            {
+                "Author": "Smith",
+                "Attributes": [
+                    {
+                        "Clarity": "No",
+                        "Brevity": "Yes"
+                    }
+                ]
+            }
+        ]
+    }
+]
