@@ -1,0 +1,84 @@
+---
+title: "Reading New York Times API: Creating a Word Cloud "
+author: "Dave Greer"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(httr2)
+library(jsonlite)
+library(RColorBrewer)
+library(wordcloud2)
+library(tm)
+library(stopwords)
+```
+## Introduction
+
+For this week's assignment I pulled book review data from the New York Times
+Review of Books.  I chose a well known novelist, John Grisham as the subject of
+assignment.  The data was originally JSON and was in this form
+
+
+{} "status":"OK","copyright":"Copyright (c) 2023 The New York Times Company.  All Rights Reserved.","num_results":32,"results": [
+  {
+    "url": "http:\/\/www.nytimes.com\/2013\/11\/10\/books\/review\/sycamore-row-by-john-grisham.html",
+    "publication_dt": "2013-11-10",
+    "byline": "CHARLIE RUBIN",
+    "book_title": "Sycamore Row",
+    "book_author": "John Grisham",
+    "summary": "John Grisham revisits Jake Brigance and Clanton, Miss., in this novel about race and inheritance.",
+    "uuid": "00000000-0000-0000-0000-000000000000",
+    "uri": "nyt:\/\/book\/00000000-0000-0000-0000-000000000000",
+    "isbn13": [ "9780345543240", "9780385363150", "9780385366458", "9780385366472", "9780385537131", "9780385537926", "9780553393613", "9780553545258" ]
+  }]
+  
+## Data Munging  
+  Below I returned the data from the api.  I removed all of the rows with blank
+  book summaries and the author's name. The text in the book summaries was the
+  source of my word cloud.
+  
+
+```{r }
+urlstring = "https://shorturl.at/fvCX1"
+#urlstring <-"https://api.nytimes.com/svc/books/v3/reviews.json?author=John+Grisham&api-key=UxmpVGTMRnOaD2CyrDgZWZ8OFrIByTrr"
+
+critics_list <- fromJSON(url(urlstring))
+
+results2<- tibble(critics_list$results)
+
+results23 <- results2 %>%filter(results2$summary != "")
+text <- results23 %>%mutate(summary = str_replace_all(summary, "[[:punct:]]", ""))%>%select(summary)
+words_to_remove <- c("Grisham", "Grishams","John", "Mr")
+text <- text %>%mutate(summary = str_replace_all(summary, paste(words_to_remove, collapse = "|"), ""))
+```
+
+## Word Cloud Creation using WordCloud2
+To create the word cloud created a corpus using the tm package.
+I use the tm package to remove the punctuation, numbers and white space.
+I turn all the words to lowercase and I remove the stop words, which are the 
+most common words such as "like, "but" and "the". I use TermDocumentMatrix to put
+all the words into a matrix. Then I sort the words and calculate their frequencies.
+For the final step I create a word cloud from the top 150 words using the wordcloud2 package.
+
+```{r}
+docs<-Corpus(VectorSource(text))
+docs<- docs %>%
+    tm_map(removeNumbers)%>%
+    tm_map(removePunctuation)%>%
+    tm_map(stripWhitespace)
+docs<-tm_map(docs,content_transformer(tolower))
+docs<-tm_map(docs,removeWords,stopwords("english"))
+
+dtm<-TermDocumentMatrix(docs)
+matrix<-as.matrix(dtm)
+words<-sort(rowSums(matrix),decreasing =TRUE)
+
+df<-data.frame(word=names(words), freq=words)
+  
+wordcloud2(slice_max(df,order_by =freq, n=150),size=0.4,color='random-light')
+
+```
+
