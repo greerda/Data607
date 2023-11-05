@@ -19,7 +19,8 @@ library(stopwords)
 
 For this week's assignment I pulled book review data from the New York Times
 Review of Books.  I chose a well known novelist, John Grisham as the subject of
-assignment.  The data was originally JSON and was in this form
+assignment. . I wanted to find the frequency of words in the summary of the books.
+The data was originally JSON and was in this form
 
 
 {} "status":"OK","copyright":"Copyright (c) 2023 The New York Times Company.  All Rights Reserved.","num_results":32,"results": [
