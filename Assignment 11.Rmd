@@ -1,0 +1,98 @@
+---
+title: "Recommender Systems"
+author: "Dave Greer"
+date: '`r Sys.Date()`'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(latexpdf)
+library(tinytex)
+```
+
+## Introduction
+Etsy is an 18 year old website and eCommerce marketplace and is ranked in the top 10 of all eCommerce sites. The company's  focus is in the handmade or vintage items and craft supplies market place. Coincidentally, this describe a lot of my home decor and clothing too.  Hmmm...  But maybe I take good care of my belongings, so its OK.  
+
+
+## Scenario Analysis
+
+### What is Etsy's Target Audience
+Etsy's key audience is anyone who is interested in buying or selling items in the
+home decor and gift market. Etsy markets itself as a side business for individuals who 
+wish to sell their handmade or vintage products to potential customers.
+
+### What is Esty's Key Goal?
+Esty's key goal is to make money as a marketplace.  This is something it has not accomplished in 5 of the past 10 years. It is believed that is a consequence of the cyclical nature of retail sales. But Etsy has connected 95 million buyers to 7.5 million sellers.
+So maybe there's money to be made in selling bell bottoms, a  $24 vintage
+Harvest Gold Dishpan or a Vintage 1970s Frigidaire RARE Mustard Yellow GM Electric Wall Oven Stove for $1,800. I am NOT Kidding!
+
+### How does Etsy work for their users?
+Since Etsy is a marketplace it has two types of users, the sellers and the buyers.
+For the buyers there are lists of options and the buyer can search using the search
+bar and find an item in any of the main categories and subcategories.  Then they 
+can perform a purchase via credit card or another payment system.
+
+For the sellers Etsy charges a minimal amount for the seller shop page and Etsy
+charges 6.5% of the final sale price and 6.5% of the postal fee.
+
+
+## Reverse Engineering Etsy
+Etsy has a portion of its website devoted to how they develop, maintain their technology.
+The URL is https://www.etsy.com/codeascraft/.  Etsy has an article 
+titled "Personalized Recommendations at Etsy" which discusses how their recommender system works.
+
+"In the first stage we build a model of users’ interests based on a matrix of historic data, for example, their past purchases or their favorite listings (those unfamiliar with matrices and linear algebra see e.g., this  review).  The models provide vector representations of users and items, and their inner products give an estimate of the level of interest a user will have in the item (higher values denote a greater degree of estimated interest).  In the second stage, we compute recommendations by finding a set of items for each user which approximately maximizes the estimate of the interest."
+
+The article goes on to describe Etsy's use of Matrix Factorization, Alternating Least Squares and Stochastic SVD (Single Value Decomposition). If you examine the code
+and articles Esty's recommender system could be reverse engineered.
+
+Initially, Esty uses "implicit feedback" data where they gather information about whether the user has a favorite item or items, and their purchases. This information is entered into a binary matrices as a one and a zero if they didn't favorite the item. This methodology assumes  through matrix factorization Etsy can make a connection between the user, defined as one binary matrix representing a user and a specific item defined as another binary matrix. 
+
+To optimize the model Etsy alternated between calculating the item and user matrices,
+minimizesizies the weighted square error, thus the name "alternating least squares".
+"At each stage, we can compute the exact minimizer of the weighted square error, since an analytic solution is available." After Etsy is comfortable with the model they update the mode with more information by repeating some steps of alternating least squares as more items, users and favorites become available. "New items and users can be folded into the model easily, so long as there are sufficiently many interactions between them and existing users and items in the model respectively"
+
+The method of alternating square has the disadvantage of taking a long time. To compensate
+Esty uses Stochastic SVD (Single Value Decomposition) which produces an orthonormal matrix.
+The new orthonormal matrix makes it easy for Etsy to create new vectors describing users and favorited and not yet favorited products.
+     
+
+Once all this work is completed they are able to build product recommendations. 
+The main technique Etsy uses is Locality sensitive hashing, which involves additional 
+linear algebra. Specificly Etsy uses "one designed to handle real-valued data and to approximate the nearest neighbors in the Euclidean distance".
+
+Finally, Esty also limits the number of recommendations from a single shop. In order to foster product diversity they limit the number of items presented to the user based on the results of Locality sensitive hashing (LSH) results and only use the highest ranked items.
+Finally Esty uses the LSH results for each user to find users with similar tastes.
+
+## Etsy's Problems 
+
+The main criticism of Etsy is the use and dissemination of the seller's and buyer 
+data to third parties where Etsy operates.  Etsy's main operations is in the US,
+UK, Canada, France, Germany, Australia. Etsy has two subsidiaries which extend its
+reach into Italy and Brazil among other countries. 
+
+## Recommendations for Improvements
+Since most of Esty's sellers are female it would be nice if it included a broader
+base of items. Based on the article I have read, its difficult to comment on the efficacy
+of Etsy's recommender system. However, other articles where recommended to me by Etsy
+seem interesting such as one titled "From Image Classification to Multitask Modeling: Building Etsy’s Search by Image Feature" and "How We Built a Multi-Task Canonical Ranker for Recommendations at Etsy".  Maybe I'll let the models work to keep be intellectually
+engaged with the site.
+
+
+## Sources
+Etsy. (2023, November 17). In Wikipedia. https://en.wikipedia.org/wiki/Etsy
+
+https://finance.yahoo.com/news/etsy-inc-etsy-significantly-undervalued-164030555.html?guccounter=1&guce_referrer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8&guce_referrer_sig=AQAAAFjOtMuXJJa-NL7lrXRZ9Uh3OgDJfJl2cLxPLmkrljm_5FyOfNS4wvj41rJV53Ie5fJKzpH6iFqiS-xpCntbUm-t9kHhIvjcyZ5ZP5iR2Hsj9g_WgD5EMkmZriGveen5IT9eW_n5_qb8mHPkgRAAZkooMS1p3Q5pVd0OtBA5YMnn#:~:text=Profitability%20and%20Growth&text=Etsy%20has%20been%20profitable%20for,ranks%20Etsy's%20profitability%20as%20fair.
+
+https://www.gurufocus.com/stock/ETSY/summary?r=caf6fe0e0db70d936033da5461e60141&utm_source=yahoo&utm_medium=article&utm_campaign=yahoo)
+
+https://www.etsy.com/search?q=bell%20bottoms%20jeans&ref=auto-1&as_prefix=bell%20bottoms
+
+https://www.etsy.com/listing/1579642726/1970s-harvest-gold-dishpan?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=Harvest+Gold&ref=sr_gallery-1-2&edd=1&sts=1&referrer_page_guid=f768f3aad40.ff0bd31e7f856d9b9eca.00&organic_search_click=1
+
+https://www.etsy.com/listing/1584139360/vintage-1970s-frigidaire-rare-harvest?ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=Harvest+Gold&ref=sr_gallery-1-41&referrer_page_guid=f76905dca63.9e2fece20d5633e936b5.00&organic_search_click=1
+
+https://www.etsy.com/codeascraft/personalized-recommendations-at-etsy?ref=codeascraft
+
+
