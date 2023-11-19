@@ -1,0 +1,120 @@
+---
+title: 'DATA 607 Project 4: Spam/Ham'
+author: "Kristin Lussi and David Greer"
+date: "2023-11-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+In this project, we created a model that classifies emails as spam or ham.
+
+## Load Packages
+```{r Packages, message = FALSE, warning = FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(wordcloud)
+library(tm)
+library(naivebayes)
+library(e1071)
+library(RTextTools)
+library(caret)
+library(quanteda)
+library(rsample)
+options(scipen = 999) 
+```
+
+## Load Data
+
+```{r LoadData, message = FALSE, warning = FALSE}
+url <- "https://raw.githubusercontent.com/kristinlussi/DATA_607/main/Project4/spam_ham_dataset.csv"
+
+spamham <- read_csv(url, show_col_types = FALSE) %>%
+  as.data.frame()
+
+head(spamham)
+```
+
+## Create a Corpus and Convert to Data Frame
+
+```{r CreateaCorpusandConverttoDataFrame, message = FALSE, warning = FALSE}
+spamham_corpus <- VCorpus(VectorSource(spamham$text)) %>%
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removeWords, stopwords("en")) %>%
+  tm_map(stripWhitespace) %>%
+  tm_map(content_transformer(function(x) gsub(".com", "", x))) %>%
+  tm_map(content_transformer(function(x) gsub("http\\S+|www\\S+", "", x))) %>%
+  tm_map(content_transformer(function(x) gsub("subject", "", x))) %>%
+  tm_map(content_transformer(function(x) gsub("http", "", x))) 
+
+spamham_df <- data.frame(text = sapply(spamham_corpus, as.character), stringsAsFactors = FALSE)
+
+spamham_clean <- data.frame(spamham_df, spamham$label) %>%
+  rename("label" = spamham.label)
+
+head(spamham_clean)
+```
+
+## Model
+
+```{r Model, message = FALSE, warning = FALSE}
+set.seed(1234)
+# split data
+splitIndex <- initial_split(spamham_clean, strata = label) 
+# training set
+train_set <- training(splitIndex) 
+# test set
+test_set <- testing(splitIndex)
+
+# calculate Training & Test Spam labels count
+train_labels <- train_set$label
+test_labels <- test_set$label
+
+# Proportion for training set
+prop.table(table(train_labels))
+
+# proportion for test set
+prop.table(table(test_labels))
+
+# Naive Bayes
+model_classifier <- naiveBayes(train_set, train_labels)
+
+# Predict the test set
+test_pred <- predict(model_classifier, newdata = test_set)
+
+# confusion matrix
+confusionMatrix(as.factor(test_pred), as.factor(test_labels), positive = "spam",
+                dnn = c("Prediction", "Actual"))
+```
+
+## Conclusion
+
+Our model has a 100% accuracy with a confidence interval of (0.9972, 1).
+
+## Word Clouds
+
+```{r WordCloud1, warning = FALSE, message = FALSE}
+# spam word cloud
+spam_indices <- which(spamham_clean$label == "spam")
+wordcloud(spamham_corpus[spam_indices], min.freq=40)
+```
+
+```{r WordCloud2, warning = FALSE, message = FALSE}
+# ham word cloud
+ham_indices <- which(spamham_clean$label == "ham")
+wordcloud(spamham_corpus[ham_indices], min.freq=40)
+```
+
+## Sources
+
+[Creating a naïve Bayes spam filter in R](https://hohenfeld.is/posts/creating-a-naive-bayes-spam-filter-in-r/)
+[Creating a Spam Filter using Naive Bayes](https://www.youtube.com/watch?v=2sXAYoPIz3A)
+
