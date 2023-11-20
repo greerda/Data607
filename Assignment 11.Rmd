@@ -47,11 +47,14 @@ titled "Personalized Recommendations at Etsy" which discusses how their recommen
 The article goes on to describe Etsy's use of Matrix Factorization, Alternating Least Squares and Stochastic SVD (Single Value Decomposition). If you examine the code
 and articles Esty's recommender system could be reverse engineered.
 
-Initially, Esty uses "implicit feedback" data where they gather information about whether the user has a favorite item or items, and their purchases. This information is entered into a binary matrices as a one and a zero if they didn't favorite the item. This methodology assumes  through matrix factorization Etsy can make a connection between the user, defined as one binary matrix representing a user and a specific item defined as another binary matrix. 
+Initially, Etsy uses "implicit feedback" data where they gather information about whether the user has a favorite item or items, and their purchases. This information is entered into a binary matrices as a one and a zero if they didn't favorite the item. This methodology assumes  through matrix factorization Etsy can make a connection between the user, defined as one binary matrix representing a user and a specific item defined as another binary matrix. 
 
 To optimize the model Etsy alternated between calculating the item and user matrices,
 minimizesizies the weighted square error, thus the name "alternating least squares".
-"At each stage, we can compute the exact minimizer of the weighted square error, since an analytic solution is available." After Etsy is comfortable with the model they update the mode with more information by repeating some steps of alternating least squares as more items, users and favorites become available. "New items and users can be folded into the model easily, so long as there are sufficiently many interactions between them and existing users and items in the model respectively"
+
+"At each stage, we can compute the exact minimizer of the weighted square error, since an analytic solution is available." 
+
+After Etsy is comfortable with the model they update the mode with more information by repeating some steps of alternating least squares as more items, users and favorites become available. "New items and users can be folded into the model easily, so long as there are sufficiently many interactions between them and existing users and items in the model respectively".
 
 The method of alternating square has the disadvantage of taking a long time. To compensate
 Esty uses Stochastic SVD (Single Value Decomposition) which produces an orthonormal matrix.
@@ -62,8 +65,8 @@ Once all this work is completed they are able to build product recommendations.
 The main technique Etsy uses is Locality sensitive hashing, which involves additional 
 linear algebra. Specificly Etsy uses "one designed to handle real-valued data and to approximate the nearest neighbors in the Euclidean distance".
 
-Finally, Esty also limits the number of recommendations from a single shop. In order to foster product diversity they limit the number of items presented to the user based on the results of Locality sensitive hashing (LSH) results and only use the highest ranked items.
-Finally Esty uses the LSH results for each user to find users with similar tastes.
+Finally, Etsy also limits the number of recommendations from a single shop. In order to foster product diversity they limit the number of items presented to the user based on the results of Locality sensitive hashing (LSH) results and only use the highest ranked items.
+Finally, Esty uses the LSH results for each user to find users with similar tastes.
 
 ## Etsy's Problems 
 
@@ -73,7 +76,7 @@ UK, Canada, France, Germany, Australia. Etsy has two subsidiaries which extend i
 reach into Italy and Brazil among other countries. 
 
 ## Recommendations for Improvements
-Since most of Esty's sellers are female it would be nice if it included a broader
+Since most of Etsy's sellers are female it would be nice if it included a broader
 base of items. Based on the article I have read, its difficult to comment on the efficacy
 of Etsy's recommender system. However, other articles where recommended to me by Etsy
 seem interesting such as one titled "From Image Classification to Multitask Modeling: Building Etsy’s Search by Image Feature" and "How We Built a Multi-Task Canonical Ranker for Recommendations at Etsy".  Maybe I'll let the models work to keep be intellectually
